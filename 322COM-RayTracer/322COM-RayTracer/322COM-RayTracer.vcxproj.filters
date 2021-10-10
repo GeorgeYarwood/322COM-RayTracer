@@ -23,13 +23,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="vertex.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OBJloader.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

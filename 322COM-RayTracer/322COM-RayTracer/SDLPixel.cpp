@@ -100,6 +100,36 @@ void ComputeColorSphere(const vec3 sourcePt, const vec3 IntPt, const vec3 CenPt,
 	ColValue = Ca + Cd + Cs;
 }
 
+//center is the sphere center position
+//orig is the origin of the ray. You set it up as (0,0,0)
+//dir is the direction of the ray
+//t is the return parameter value of intersection. Range from [0,1]
+bool intersectSphere(vec3 center, vec3 orig, vec3 dir, float radius, float& t)
+{
+	float t0, t1; // solutions for t if the ray intersects 
+
+	// geometric solution  // vector dir has to be normalize, length is 1.0
+	vec3 L = center - orig;
+	float tca = dot(L, dir);
+	if (tca < 0) return false;
+	float d = dot(L, L) - tca * tca;
+	if (d > (radius * radius)) return false;
+
+	float thc = sqrt(radius * radius - d);
+	t0 = tca - thc;
+	t1 = tca + thc;
+
+	if (t0 > t1) std::swap(t0, t1);
+
+	if (t0 < 0) {
+		t0 = t1; // if t0 is negative, let's use t1 instead 
+		if (t0 < 0) return false; // both t0 and t1 are negative 
+	}
+
+	t = t0;
+	return true;
+}
+
 int main(int argc, char* args[])
 {
 	const int WIDTH = 640;
@@ -125,6 +155,18 @@ int main(int argc, char* args[])
 	vector<float> t_arr;
 	vector<vec3> color_arr;
 
+	Sphere redsphere(4, vec3(0, 0, -20), vec3(1.00, 0.32, 0.36));
+	color_arr.push_back(redsphere.getMyColor());
+
+	Sphere yellowsphere(2, vec3(5, -1, -15), vec3(0.90, 0.76, 0.46));
+	color_arr.push_back(yellowsphere.getMyColor());
+
+	Sphere bluesphere(3, vec3(5, 0, -25), vec3(0.65, 0.77, 0.97));
+	color_arr.push_back(bluesphere.getMyColor());
+
+	Sphere greyphere(3, vec3(-5.5, 0, -15), vec3(0.90, 0.90, 0.90));
+	color_arr.push_back(greyphere.getMyColor());
+
 
 	///light setting
 	vec3 sourcePt;
@@ -143,8 +185,8 @@ int main(int argc, char* args[])
 			PixelRdy = 1.0 - 2 * PixelNdy;
 			PixelRdx = PixelRdx * Iar;
 
-			PCameraX = PixelRdx*tanvalue;
-			PCameraY = PixelRdy*tanvalue;
+			PCameraX = PixelRdx * tanvalue;
+			PCameraY = PixelRdy * tanvalue;
 
 			ttvec.x = PCameraX;
 			ttvec.y = PCameraY;
@@ -153,7 +195,35 @@ int main(int argc, char* args[])
 			dir = normalize(ttvec);
 
 			org.x = 0.0; org.y = 0.0; org.z = 0.0;
-			
+
+			Intersection = intersectSphere(redsphere.getCenter(), org, dir, redsphere.getRadius(), t);
+			if (Intersection)
+			{
+				t_arr.push_back(t);
+				color_arr.push_back(redsphere.getMyColor());
+			}
+
+			Intersection = intersectSphere(yellowsphere.getCenter(), org, dir, yellowsphere.getRadius(), t);
+			if (Intersection)
+			{
+				t_arr.push_back(t);
+				color_arr.push_back(yellowsphere.getMyColor());
+			}
+
+			Intersection = intersectSphere(bluesphere.getCenter(), org, dir, bluesphere.getRadius(), t);
+			if (Intersection)
+			{
+				t_arr.push_back(t);
+				color_arr.push_back(bluesphere.getMyColor());
+			}
+
+			Intersection = intersectSphere(greyphere.getCenter(), org, dir, greyphere.getRadius(), t);
+			if (Intersection)
+			{
+				t_arr.push_back(t);
+				color_arr.push_back(greyphere.getMyColor());
+			}
+
 			if (t_arr.size() == 0)
 			{
 				image[x][y].x = 1.0;
@@ -178,6 +248,7 @@ int main(int argc, char* args[])
 			}
 		}
 	}
+	
 
 	SDL_UpdateWindowSurface(window);
 	bool quit = false;

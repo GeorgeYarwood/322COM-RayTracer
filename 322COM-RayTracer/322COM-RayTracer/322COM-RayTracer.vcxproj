@@ -147,7 +147,6 @@
     <ClCompile Include="sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="OBJloader.h" />
     <ClInclude Include="sphere.h" />
     <ClInclude Include="vertex.h" />
   </ItemGroup>
