@@ -2,8 +2,8 @@
 
 Sphere::Sphere(float r, vec3 cen, vec3 col) {
 	radius = r;
-	center = cen;
-	mycolor = col;
+	centre = cen;
+	colour = col;
 }
 
 Sphere::~Sphere()
@@ -15,12 +15,15 @@ float Sphere::getRadius(void)
 	return radius;
 }
 
-vec3 Sphere::getCenter(void)
+vec3 Sphere::getCenter()
 {
-	return center;
+	return centre;
 }
 
-vec3 Sphere::getMyColor(void)
+vec3 Sphere::getMyColor()
 {
-	return mycolor;
+	return colour;
 }
+
+
+

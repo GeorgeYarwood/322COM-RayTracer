@@ -1,18 +1,18 @@
 #pragma once
-#include <glm/glm.hpp>
+#include "shape.h"
 
-using namespace glm;
-
-class Sphere
+class Sphere :
+	public shape
 {
 private:
 	float radius;
-	vec3  center;
-	vec3 mycolor;
+	vec3 centre;
+	vec3 colour;
 public:
 	Sphere(float, vec3, vec3);
 	~Sphere();
-	float getRadius(void);
-	vec3 getCenter(void);
-	vec3 getMyColor(void);
+	float getRadius();
+	vec3 getCenter() override;
+	vec3 getMyColor() override;
+	
 };
