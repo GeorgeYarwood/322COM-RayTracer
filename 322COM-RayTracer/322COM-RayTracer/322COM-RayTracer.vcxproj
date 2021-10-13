@@ -143,13 +143,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="plane.cpp" />
-    <ClCompile Include="SDLPixel.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="shape.cpp" />
     <ClCompile Include="sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="plane.h" />
     <ClInclude Include="shape.h" />
     <ClInclude Include="sphere.h" />
     <ClInclude Include="vertex.h" />
