@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 					
 					if((int)sqrt((y - redSphere.currRad) * (y - redSphere.currRad) + (x - redSphere.currRad) * (x - redSphere.currRad)) < redSphere.currRad)
 					{
-						pixels[y * width + x] = 900;
+						pixels[y * width + x] =2988;
 					}
 					
 
