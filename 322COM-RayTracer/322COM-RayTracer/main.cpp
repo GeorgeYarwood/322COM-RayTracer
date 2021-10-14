@@ -7,6 +7,7 @@
 #include <SDL.h>
 #include <glm/glm.hpp>
 #include "light.h"
+#include "rayHit.h"
 using namespace std;
 using namespace glm;
 
@@ -31,7 +32,7 @@ bool quit = false;
 
 
 
-bool sphereIntersection(vec3 centre, vec3& orig, vec3& dir, float radius, float& t)
+bool sphereIntersection(vec3 centre, vec3& orig, vec3& dir, float radius, rayHit& hit)
 {
 	float t0, t1;
 	// geometric solution  // vector dir has to be normalize, length is 1.0
@@ -52,7 +53,15 @@ bool sphereIntersection(vec3 centre, vec3& orig, vec3& dir, float radius, float&
 		if (t0 < 0) return false; // both t0 and t1 are negative 
 	}
 
-	t = t0;
+
+	hit.intersectPoint = orig + rayDir * t0;
+	
+	//ray origin 
+	// 	   +
+	//ray direction
+	//*
+		//t2
+	hit.rayDist = t0;
 	return true;
 }
 
@@ -83,6 +92,30 @@ void drawPixel(Uint32* &pixels, int x, int y, Uint32 colour)
 
 	pixels[y * width + x] = colour;
 
+}
+
+void ComputeColorSphere(float Ca, float Cd, const vec3 sourcePt, const vec3 IntPt, const vec3 CenPt, const vec3 dir, float& ColValue)
+{
+	vec3 lightToPt, surNorm, rVec, ttvec;
+	float Cs, tt; //Ca for ambient colour; //Cd for diffuse colour; //Cs for specular highlights
+	float vecdot;
+	lightToPt = normalize(sourcePt - IntPt);
+	surNorm = normalize(IntPt - CenPt);
+	//Cd = std::max(0.0, (double)dot(lightToPt, surNorm));
+	//Ca = 0.2;
+
+	//compute specular value
+	vecdot = dot(surNorm, lightToPt);
+	ttvec.x = surNorm.x * 2.0 * vecdot;
+	ttvec.y = surNorm.y * 2.0 * vecdot;
+	ttvec.z = surNorm.z * 2.0 * vecdot;
+
+	rVec = ttvec - lightToPt;
+	tt = std::max(0.0, (double)dot(rVec, -dir));
+	Cs = pow(tt, 20) * 0.7;
+
+	//ColValue = Cs;
+	ColValue = Ca + Cd + Cs;
 }
 
 int main(int argc, char* argv[])
@@ -132,10 +165,11 @@ int main(int argc, char* argv[])
 
 		///light setting
 		vec3 lightSrc;
-		lightSrc.x = 0.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
+		lightSrc.x = -2.0; lightSrc.y = 2.0; lightSrc.z = 0.0;
 
 		vector<float> saved_rayDists;
 		vector<vec3> saved_colour;
+
 		
 		while (!quit)
 		{
@@ -173,60 +207,49 @@ int main(int argc, char* argv[])
 					rayDir = normalize(camVec);
 
 					//Written to and saved with each intersection check
-					float rayDist;
+					rayHit hit;
+					float colVal;
 
-					if (sphereIntersection(redSphere.getPos(), rayOrigin, rayDir, redSphere.getRad(), rayDist))
+					if (sphereIntersection(redSphere.getPos(), rayOrigin, rayDir, redSphere.getRad(), hit))
 					{
 						//Check distance of ray from camera and save colour for later
-						saved_rayDists.push_back(rayDist);
-						saved_colour.push_back(redSphere.getColour());
+						saved_rayDists.push_back(hit.rayDist);
+						hit.ambientCol = convertColour(blueSphere.getColour());
+						hit.diffuseCol = 0.7;
+						ComputeColorSphere(hit.ambientCol, hit.diffuseCol,lightSrc, redSphere.getPos(), hit.intersectPoint, rayDir, colVal);
+						//saved_colour.push_back();
+						drawPixel(pixels, x, y, colVal * 5000);
 					}
 
-					if (sphereIntersection(blueSphere.getPos(), rayOrigin, rayDir, blueSphere.getRad(), rayDist))
-					{
-						saved_rayDists.push_back(rayDist);
-						saved_colour.push_back(blueSphere.getColour());
-					}
-					if (sphereIntersection(greenSphere.getPos(), rayOrigin, rayDir, greenSphere.getRad(), rayDist))
-					{
-						saved_rayDists.push_back(rayDist);
-						saved_colour.push_back(greenSphere.getColour());
-					}
+					
+					////If we don't hit anything, draw default colours
+					//if (saved_rayDists.size() == 0)
+					//{
+					//	framebuffer[x][y].x = 1.0;
+					//	framebuffer[x][y].y = 1.0;
+					//	framebuffer[x][y].z = 1.0;
+					//	
 
-					if (sphereIntersection(yellowSphere.getPos(), rayOrigin, rayDir, yellowSphere.getRad(), rayDist))
-					{
-						saved_rayDists.push_back(rayDist);
-						saved_colour.push_back(yellowSphere.getColour());
-					}
+					//	drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
 
-					//If we don't hit anything, draw default colours
-					if (saved_rayDists.size() == 0)
-					{
-						framebuffer[x][y].x = 1.0;
-						framebuffer[x][y].y = 1.0;
-						framebuffer[x][y].z = 1.0;
-						
+					//}
+					//else
+					//{
+					//	float minRayDist = 1000;
 
-						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
+					//	//Sort through hit objects and decide which ones to draw first
+					//	int whichone = 0;
+					//	for (int i = 0; i < saved_rayDists.size(); i++)
+					//	{
+					//		if (saved_rayDists[i] < minRayDist) { whichone = i; minRayDist = saved_rayDists[i]; }
+					//	}
+					//	framebuffer[x][y].x = saved_colour[whichone].x;
+					//	framebuffer[x][y].y = saved_colour[whichone].y;
+					//	framebuffer[x][y].z = saved_colour[whichone].z;
 
-					}
-					else
-					{
-						float minRayDist = 1000;
+					//	drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
 
-						//Sort through hit objects and decide which ones to draw first
-						int whichone = 0;
-						for (int i = 0; i < saved_rayDists.size(); i++)
-						{
-							if (saved_rayDists[i] < minRayDist) { whichone = i; minRayDist = saved_rayDists[i]; }
-						}
-						framebuffer[x][y].x = saved_colour[whichone].x;
-						framebuffer[x][y].y = saved_colour[whichone].y;
-						framebuffer[x][y].z = saved_colour[whichone].z;
-
-						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
-
-					}
+					//}
 					//Test raster method
 
 					/*if ((int)sqrt((y - redSphere.currRad) * (y - redSphere.currRad) + (x - redSphere.currRad) * (x - redSphere.currRad)) < redSphere.currRad)

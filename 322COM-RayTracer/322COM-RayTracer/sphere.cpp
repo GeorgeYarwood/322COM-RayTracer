@@ -15,6 +15,7 @@ vec3 Sphere::getPos()
 	return currPos;
 }
 
+
 vec3 Sphere::getColour()
 {
 	return currColour;
