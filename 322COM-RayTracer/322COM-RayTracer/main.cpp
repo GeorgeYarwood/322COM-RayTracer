@@ -118,10 +118,7 @@ int main(int argc, char* argv[])
 		Sphere redSphere = Sphere(vec3(0, 0, -10), 1, vec3(255, 0, 0));
 		Sphere greenSphere = Sphere(vec3(-2, 0, -20), 1, vec3(0, 255, 0));
 		Sphere blueSphere = Sphere(vec3(0, 0, -5), 0.2, vec3(0, 0, 255));
-		Sphere yellowSphere = Sphere(vec3(0, -37, -100), 35, vec3(255, 69, 0));
-
-		//Calculate image aspect ratio
-		float imageAspect = width / (float)height;
+		Sphere yellowSphere = Sphere(vec3(0, -37, -100), 40, vec3(255, 69, 0));
 
 		//Vector 
 		vec3** framebuffer = new vec3 * [width];
@@ -196,10 +193,10 @@ int main(int argc, char* argv[])
 						saved_colour.push_back(greenSphere.getColour());
 					}
 
-					if (sphereIntersection(orangeSphere.getPos(), rayOrigin, rayDir, orangeSphere.getRad(), rayDist))
+					if (sphereIntersection(yellowSphere.getPos(), rayOrigin, rayDir, yellowSphere.getRad(), rayDist))
 					{
 						saved_rayDists.push_back(rayDist);
-						saved_colour.push_back(orangeSphere.getColour());
+						saved_colour.push_back(yellowSphere.getColour());
 					}
 
 					//If we don't hit anything, draw default colours
