@@ -122,6 +122,7 @@ int main(int argc, char* argv[])
 		//Calculate image aspect ratio
 		float imageAspect = width / (float)height;
 
+		//Vector 
 		vec3** framebuffer = new vec3 * [width];
 		for (int i = 0; i < width; i++) framebuffer[i] = new vec3[height];
 
@@ -135,15 +136,8 @@ int main(int argc, char* argv[])
 		vec3 lightSrc;
 		lightSrc.x = 0.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
 
-		vector<float> obj_arr;
-		vector<vec3> color_arr;
-
-		
-
-
-		
-
-
+		vector<float> saved_rayDists;
+		vector<vec3> saved_colour;
 		
 		while (!quit)
 		{
@@ -155,18 +149,15 @@ int main(int argc, char* argv[])
 			{
 				for (int x = 0; x < width; x++)
 				{
+					saved_rayDists.clear();
+					saved_colour.clear();
 
-
-					obj_arr.clear();
-					color_arr.clear();
 					//Convert to NDC space
 					float NDCx = (x + 0.5) / width;
 					float NDCy = (y + 0.5) / height;
+
 					//Convert to screen space
-
 					float ScreenX = 2 * NDCx - 1;
-
-
 					ScreenX = ScreenX * width/(float)height;
 					float ScreenY = 1 - 2 * NDCy;
 
@@ -180,36 +171,38 @@ int main(int argc, char* argv[])
 					camVec.y = camSpaceY;
 					camVec.z = -1.0; //Depth
 
-
+					//Normalize camera vector
 					rayDir = normalize(camVec);
 
+					//Written to and saved with each intersection check
 					float rayDist;
 
 					if (sphereIntersection(redSphere.getPos(), rayOrigin, rayDir, redSphere.getRad(), rayDist))
 					{
 						//Check distance of ray from camera and save colour for later
-						obj_arr.push_back(rayDist);
-						color_arr.push_back(redSphere.getColour());
+						saved_rayDists.push_back(rayDist);
+						saved_colour.push_back(redSphere.getColour());
 					}
 
 					if (sphereIntersection(blueSphere.getPos(), rayOrigin, rayDir, blueSphere.getRad(), rayDist))
 					{
-						obj_arr.push_back(rayDist);
-						color_arr.push_back(blueSphere.getColour());
+						saved_rayDists.push_back(rayDist);
+						saved_colour.push_back(blueSphere.getColour());
 					}
 					if (sphereIntersection(greenSphere.getPos(), rayOrigin, rayDir, greenSphere.getRad(), rayDist))
 					{
-						obj_arr.push_back(rayDist);
-						color_arr.push_back(greenSphere.getColour());
+						saved_rayDists.push_back(rayDist);
+						saved_colour.push_back(greenSphere.getColour());
 					}
 
-
-					if (obj_arr.size() == 0)
+					//If we don't hit anything, draw default colours
+					if (saved_rayDists.size() == 0)
 					{
 						framebuffer[x][y].x = 1.0;
 						framebuffer[x][y].y = 1.0;
 						framebuffer[x][y].z = 1.0;
 						
+
 						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
 
 					}
@@ -217,14 +210,15 @@ int main(int argc, char* argv[])
 					{
 						float minRayDist = 1000;
 
+						//Sort through hit objects and decide which ones to draw first
 						int whichone = 0;
-						for (int i = 0; i < obj_arr.size(); i++)
+						for (int i = 0; i < saved_rayDists.size(); i++)
 						{
-							if (obj_arr[i] < minRayDist) { whichone = i; minRayDist = obj_arr[i]; }
+							if (saved_rayDists[i] < minRayDist) { whichone = i; minRayDist = saved_rayDists[i]; }
 						}
-						framebuffer[x][y].x = color_arr[whichone].x;
-						framebuffer[x][y].y = color_arr[whichone].y;
-						framebuffer[x][y].z = color_arr[whichone].z;
+						framebuffer[x][y].x = saved_colour[whichone].x;
+						framebuffer[x][y].y = saved_colour[whichone].y;
+						framebuffer[x][y].z = saved_colour[whichone].z;
 
 						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
 
