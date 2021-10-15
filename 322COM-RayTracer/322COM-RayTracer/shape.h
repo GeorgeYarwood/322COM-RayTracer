@@ -7,7 +7,8 @@ class shape
 private: 
 	vec3 centre;
 	vec3 diffuseColour;
-	vec3 diffuseIntesity;
+	vec3 diffuseIntensity;
+	float specIntensity;
 
 public:
 	shape();

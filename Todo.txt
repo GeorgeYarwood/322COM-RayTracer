@@ -1,0 +1,9 @@
+
+Make shape class have functions for intersection and computing colour
+Make sphere class derive from sphape class
+Cleanup code
+Add shadows
+Make light class that has pos + Intensity
+Add plane
+And triangle
+add mesh loading
