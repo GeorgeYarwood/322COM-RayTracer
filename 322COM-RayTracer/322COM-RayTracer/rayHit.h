@@ -3,6 +3,6 @@
 struct rayHit {
 	glm::vec3 intersectPoint;
 	float rayDist;
-	float ambientCol;
-	float diffuseCol;
+	glm::vec3 ambientCol;
+	glm::vec3 diffuseCol;
 };

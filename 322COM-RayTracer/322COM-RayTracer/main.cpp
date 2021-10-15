@@ -119,28 +119,38 @@ void drawPixel(Uint32* &pixels, int x, int y, Uint32 colour)
 
 }
 
-void ComputeColorSphere(float Ca, float Cd, const vec3 sourcePt, const vec3 IntPt, const vec3 CenPt, const vec3 dir, float& ColValue)
+void ComputeColorSphere(vec3 ambLightIntensity, vec3 ambCol, vec3 diffColour, const vec3 sourcePt, const vec3 IntPt, const vec3 CenPt, const vec3 dir, vec3& ColValue)
 {
 	vec3 lightToPt, surNorm, rVec, ttvec;
 	float Cs, tt; //Ca for ambient colour; //Cd for diffuse colour; //Cs for specular highlights
 	float vecdot;
+
+	//Calculate normal value and light ray
 	lightToPt = normalize(sourcePt - IntPt);
 	surNorm = normalize(IntPt - CenPt);
-	Cd = std::max(0.0, (double)dot(lightToPt, surNorm));
-	//Ca = 0.2;
+
+	//Ambient light
+	ambCol.r = 0.7;
+	ambCol.g = 0.7;
+	ambCol.b = 0.7;
+
+	
+
+	//Diffuse lighting calculation
+	diffColour = ambCol * ambLightIntensity * std::max(0.0f, dot(lightToPt, surNorm));
 
 	//compute specular value
-	vecdot = dot(surNorm, lightToPt);
+	/*vecdot = dot(surNorm, lightToPt);
 	ttvec.x = surNorm.x * 2.0 * vecdot;
 	ttvec.y = surNorm.y * 2.0 * vecdot;
 	ttvec.z = surNorm.z * 2.0 * vecdot;
 
 	rVec = ttvec - lightToPt;
 	tt = std::max(0.0, (double)dot(rVec, -dir));
-	Cs = pow(tt, 20) * 0.7;
+	Cs = pow(tt, 20) * 0.7;*/
 
 	//ColValue = Cs;
-	ColValue = Ca + Cd + Cs;
+	ColValue = diffColour;
 }
 
 int main(int argc, char* argv[])
@@ -190,7 +200,7 @@ int main(int argc, char* argv[])
 
 		///light setting
 		vec3 lightSrc;
-		lightSrc.x = 1.0; lightSrc.y = 3.0; lightSrc.z = -1.0;
+		lightSrc.x = 0.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
 
 		vector<float> saved_rayDists;
 		vector<vec3> saved_colour;
@@ -233,44 +243,28 @@ int main(int argc, char* argv[])
 
 					//Written to and saved with each intersection check
 					rayHit hit;
-					float colVal;
+					vec3 colVal;
+
+					vec3 lightIntensity = vec3(1,1,1);
 
 					if (sphereIntersection(redSphere.getPos(), rayOrigin, rayDir, redSphere.getRad(), hit))
 					{
 						//Check distance of ray from camera and save colour for later
 						saved_rayDists.push_back(hit.rayDist);
-						hit.ambientCol = convertColour(redSphere.getColour());
-						hit.diffuseCol = 0.7;
-						ComputeColorSphere(hit.ambientCol, hit.diffuseCol,lightSrc, redSphere.getPos(), hit.intersectPoint, rayDir, colVal);
-						saved_colour.push_back(convertColourToVec(colVal));
+						hit.ambientCol = redSphere.getColour();
+						//hit.diffuseCol = 0.7;
+						ComputeColorSphere(lightIntensity, hit.ambientCol, hit.diffuseCol,lightSrc, redSphere.getPos(), hit.intersectPoint, rayDir, colVal);
+						saved_colour.push_back(colVal);
 					}
-					if (sphereIntersection(blueSphere.getPos(), rayOrigin, rayDir, blueSphere.getRad(), hit))
-					{
-						//Check distance of ray from camera and save colour for later
-						saved_rayDists.push_back(hit.rayDist);
-						hit.ambientCol = convertColour(blueSphere.getColour());
-						hit.diffuseCol = 0.7;
-						ComputeColorSphere(hit.ambientCol, hit.diffuseCol, lightSrc, blueSphere.getPos(), hit.intersectPoint, rayDir, colVal);
-						saved_colour.push_back(convertColourToVec(colVal));
-					}
-					if (sphereIntersection(greenSphere.getPos(), rayOrigin, rayDir, greenSphere.getRad(), hit))
-					{
-						//Check distance of ray from camera and save colour for later
-						saved_rayDists.push_back(hit.rayDist);
-						hit.ambientCol = convertColour(greenSphere.getColour());
-						hit.diffuseCol = 0.7;
-						ComputeColorSphere(hit.ambientCol, hit.diffuseCol, lightSrc, greenSphere.getPos(), hit.intersectPoint, rayDir, colVal);
-						saved_colour.push_back(convertColourToVec(colVal));
-					}
-
+					
 					
 
 					//If we don't hit anything, draw default colours
 					if (saved_rayDists.size() == 0)
 					{
-						framebuffer[x][y].x = 0.0;
-						framebuffer[x][y].y = 0.0;
-						framebuffer[x][y].z = 0.0;
+						framebuffer[x][y].x = 1.0;
+						framebuffer[x][y].y = 1.0;
+						framebuffer[x][y].z = 1.0;
 						
 
 						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
