@@ -16,7 +16,7 @@ using namespace glm;
 SDL_Window* sdlWindow;
 SDL_Renderer* sdlRenderer;
 
-
+//Event manager
 SDL_Event event;
 
 //Rendering width/height/FOV
@@ -26,10 +26,10 @@ float fov = 60;
 
 
 int pitch;
-
 bool quit = false;
 
 
+//Converts colours from RGB vec3 to a Uint for SDL
 Uint32 convertColour(vec3 colour)
 {
 	int tt;
@@ -50,9 +50,9 @@ Uint32 convertColour(vec3 colour)
 	return rgb;
 };
 
+//Converts SDL Uint colour to RGB vec3
 vec3 convertColourToVec(Uint32 colour)
 {
-
 	vec3 rgb;
 
 	Uint8 r;
@@ -75,9 +75,8 @@ vec3 convertColourToVec(Uint32 colour)
 
 void drawPixel(Uint32*& pixels, int x, int y, Uint32 colour)
 {
-
+	//Set the specified pixel to a certain colour
 	pixels[y * width + x] = colour;
-
 }
 
 
@@ -117,10 +116,11 @@ int main(int argc, char* argv[])
 		Sphere redSphere = Sphere(vec3(0, 0, -10), 0.5, vec3(255, 0, 0), 0, 1.2);
 		Sphere greenSphere = Sphere(vec3(2, -1, -20), 1, vec3(0, 255, 0), 0, 1.2);
 		
-		
+		//Add them into our vector
 		shapes.push_back(&redSphere);
 		shapes.push_back(&greenSphere);
-		//Vector 
+
+		//Where we store our image
 		vec3** framebuffer = new vec3 * [width];
 		for (int i = 0; i < width; i++) framebuffer[i] = new vec3[height];
 
@@ -132,7 +132,10 @@ int main(int argc, char* argv[])
 
 		///light setting
 		vec3 lightSrc;
-		lightSrc.x = 2.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
+		lightSrc.x = 10.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
+		vec3 lightIntensity = vec3(0.1, 0.1, 0.1);
+
+
 
 		vector<float> saved_rayDists;
 		vector<vec3> saved_colour;
@@ -177,7 +180,6 @@ int main(int argc, char* argv[])
 					rayHit hit;
 					vec3 colVal;
 
-					vec3 lightIntensity = vec3(0.1, 0.1, 0.1);
 
 					//For every shape in the vector
 					for(int currShape = 0; currShape < shapes.size(); currShape++)
