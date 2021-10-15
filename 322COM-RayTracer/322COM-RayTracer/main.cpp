@@ -54,8 +54,8 @@ bool sphereIntersection(vec3 centre, vec3& orig, vec3& dir, float radius, rayHit
 	}
 
 
-	hit.intersectPoint = orig + rayDir * t0;
-	
+	hit.intersectPoint = orig + dir * t0;
+
 	//ray origin 
 	// 	   +
 	//ray direction
@@ -88,9 +88,9 @@ Uint32 convertColour(vec3 colour)
 
 vec3 convertColourToVec(Uint32 colour)
 {
-	
+
 	vec3 rgb;
-	
+
 	Uint8 r;
 	Uint8 g;
 	Uint8 b;
@@ -112,14 +112,14 @@ vec3 convertColourToVec(Uint32 colour)
 
 
 
-void drawPixel(Uint32* &pixels, int x, int y, Uint32 colour)
+void drawPixel(Uint32*& pixels, int x, int y, Uint32 colour)
 {
 
 	pixels[y * width + x] = colour;
 
 }
 
-void ComputeColorSphere(vec3 ambLightIntensity, vec3 ambCol, vec3 diffColour, const vec3 sourcePt, const vec3 IntPt, const vec3 CenPt, const vec3 dir, vec3& ColValue)
+void ComputeColorSphere(vec3 ambLightIntensity, float specIntensity, vec3 ambCol, vec3 diffColour, const vec3 sourcePt, const vec3 IntPt, const vec3 CenPt, const vec3 dir, vec3& ColValue)
 {
 	vec3 lightToPt, surNorm, rVec, ttvec;
 	float Cs, tt; //Ca for ambient colour; //Cd for diffuse colour; //Cs for specular highlights
@@ -130,27 +130,26 @@ void ComputeColorSphere(vec3 ambLightIntensity, vec3 ambCol, vec3 diffColour, co
 	surNorm = normalize(IntPt - CenPt);
 
 	//Ambient light
-	ambCol.r = 0.7;
-	ambCol.g = 0.7;
-	ambCol.b = 0.7;
+	ambCol.r *= ambLightIntensity.r;
+	ambCol.g *= ambLightIntensity.g;
+	ambCol.b *= ambLightIntensity.b;;
 
-	
 
 	//Diffuse lighting calculation
 	diffColour = ambCol * ambLightIntensity * std::max(0.0f, dot(lightToPt, surNorm));
 
 	//compute specular value
-	/*vecdot = dot(surNorm, lightToPt);
+	vecdot = dot(surNorm, lightToPt);
 	ttvec.x = surNorm.x * 2.0 * vecdot;
 	ttvec.y = surNorm.y * 2.0 * vecdot;
 	ttvec.z = surNorm.z * 2.0 * vecdot;
 
 	rVec = ttvec - lightToPt;
 	tt = std::max(0.0, (double)dot(rVec, -dir));
-	Cs = pow(tt, 20) * 0.7;*/
+	Cs = pow(tt, 20) * specIntensity;
 
 	//ColValue = Cs;
-	ColValue = diffColour;
+	ColValue = diffColour + Cs;
 }
 
 int main(int argc, char* argv[])
@@ -200,12 +199,12 @@ int main(int argc, char* argv[])
 
 		///light setting
 		vec3 lightSrc;
-		lightSrc.x = 0.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
+		lightSrc.x = 2.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
 
 		vector<float> saved_rayDists;
 		vector<vec3> saved_colour;
 
-		
+
 		while (!quit)
 		{
 			//Update texture with the pixel array
@@ -225,7 +224,7 @@ int main(int argc, char* argv[])
 
 					//Convert to screen space
 					float ScreenX = 2 * NDCx - 1;
-					ScreenX = ScreenX * width/(float)height;
+					ScreenX = ScreenX * width / (float)height;
 					float ScreenY = 1 - 2 * NDCy;
 
 					//Convert to camera space
@@ -245,7 +244,7 @@ int main(int argc, char* argv[])
 					rayHit hit;
 					vec3 colVal;
 
-					vec3 lightIntensity = vec3(1,1,1);
+					vec3 lightIntensity = vec3(0.1, 0.1, 0.1);
 
 					if (sphereIntersection(redSphere.getPos(), rayOrigin, rayDir, redSphere.getRad(), hit))
 					{
@@ -253,11 +252,37 @@ int main(int argc, char* argv[])
 						saved_rayDists.push_back(hit.rayDist);
 						hit.ambientCol = redSphere.getColour();
 						//hit.diffuseCol = 0.7;
-						ComputeColorSphere(lightIntensity, hit.ambientCol, hit.diffuseCol,lightSrc, redSphere.getPos(), hit.intersectPoint, rayDir, colVal);
+						ComputeColorSphere(lightIntensity, 1, hit.ambientCol, hit.diffuseCol, lightSrc, hit.intersectPoint, redSphere.getPos(), rayDir, colVal);
 						saved_colour.push_back(colVal);
 					}
-					
-					
+					if (sphereIntersection(blueSphere.getPos(), rayOrigin, rayDir, blueSphere.getRad(), hit))
+					{
+						//Check distance of ray from camera and save colour for later
+						saved_rayDists.push_back(hit.rayDist);
+						hit.ambientCol = blueSphere.getColour();
+						//hit.diffuseCol = 0.7;
+						ComputeColorSphere(lightIntensity, 1, hit.ambientCol, hit.diffuseCol, lightSrc, hit.intersectPoint, blueSphere.getPos(), rayDir, colVal);
+						saved_colour.push_back(colVal);
+					}
+					if (sphereIntersection(greenSphere.getPos(), rayOrigin, rayDir, greenSphere.getRad(), hit))
+					{
+						//Check distance of ray from camera and save colour for later
+						saved_rayDists.push_back(hit.rayDist);
+						hit.ambientCol = greenSphere.getColour();
+						//hit.diffuseCol = 0.7;
+						ComputeColorSphere(lightIntensity, 1, hit.ambientCol, hit.diffuseCol, lightSrc, hit.intersectPoint, greenSphere.getPos(), rayDir, colVal);
+						saved_colour.push_back(colVal);
+					}
+					if (sphereIntersection(yellowSphere.getPos(), rayOrigin, rayDir, yellowSphere.getRad(), hit))
+					{
+						//Check distance of ray from camera and save colour for later
+						saved_rayDists.push_back(hit.rayDist);
+						hit.ambientCol = yellowSphere.getColour();
+						//hit.diffuseCol = 0.7;
+						ComputeColorSphere(lightIntensity, 1, hit.ambientCol, hit.diffuseCol, lightSrc, hit.intersectPoint, yellowSphere.getPos(), rayDir, colVal);
+						saved_colour.push_back(colVal);
+					}
+
 
 					//If we don't hit anything, draw default colours
 					if (saved_rayDists.size() == 0)
@@ -265,7 +290,7 @@ int main(int argc, char* argv[])
 						framebuffer[x][y].x = 1.0;
 						framebuffer[x][y].y = 1.0;
 						framebuffer[x][y].z = 1.0;
-						
+
 
 						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
 
@@ -293,13 +318,13 @@ int main(int argc, char* argv[])
 					{
 						 =2988;
 					}*/
-					
+
 
 				}
 
 
-				
-				
+
+
 
 			}
 			//Poll exit button
@@ -318,12 +343,12 @@ int main(int argc, char* argv[])
 			//Render it
 			SDL_RenderPresent(sdlRenderer);
 		}
-		
+
 		delete[] pixels;
 
 		delete[] framebuffer;
 
-		
+
 
 		//Destroy window
 		SDL_DestroyWindow(sdlWindow);
@@ -337,7 +362,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	
+
 }
 
 
