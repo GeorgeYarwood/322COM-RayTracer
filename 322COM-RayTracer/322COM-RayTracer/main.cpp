@@ -86,6 +86,31 @@ Uint32 convertColour(vec3 colour)
 	return rgb;
 };
 
+vec3 convertColourToVec(Uint32 colour)
+{
+	
+	vec3 rgb;
+	
+	Uint8 r;
+	Uint8 g;
+	Uint8 b;
+
+	//Get pixel format from SDL wimdow
+	Uint32 format = SDL_GetWindowPixelFormat(sdlWindow);
+	SDL_PixelFormat* mappingFormat = SDL_AllocFormat(format);
+
+	SDL_GetRGB(colour, mappingFormat, &r, &g, &b);
+
+	rgb.r = (int)r;
+	rgb.g = (int)g;
+	rgb.b = (int)b;
+
+	return rgb;
+};
+
+
+
+
 
 void drawPixel(Uint32* &pixels, int x, int y, Uint32 colour)
 {
@@ -101,7 +126,7 @@ void ComputeColorSphere(float Ca, float Cd, const vec3 sourcePt, const vec3 IntP
 	float vecdot;
 	lightToPt = normalize(sourcePt - IntPt);
 	surNorm = normalize(IntPt - CenPt);
-	//Cd = std::max(0.0, (double)dot(lightToPt, surNorm));
+	Cd = std::max(0.0, (double)dot(lightToPt, surNorm));
 	//Ca = 0.2;
 
 	//compute specular value
@@ -145,12 +170,12 @@ int main(int argc, char* argv[])
 		Uint32* pixels = new Uint32[width * height];
 
 		//Set background colour to white
-		memset(pixels, 255, width * height * sizeof(Uint32));
+		memset(pixels, 155, width * height * sizeof(Uint32));
 
 		//Instance of sphere
-		Sphere redSphere = Sphere(vec3(0, 0, -10), 1, vec3(255, 0, 0));
-		Sphere greenSphere = Sphere(vec3(-2, 0, -20), 1, vec3(0, 255, 0));
-		Sphere blueSphere = Sphere(vec3(0, 0, -5), 0.2, vec3(0, 0, 255));
+		Sphere redSphere = Sphere(vec3(0, 0, -10), 0.5, vec3(255, 0, 0));
+		Sphere greenSphere = Sphere(vec3(2, -1, -20), 1, vec3(0, 255, 0));
+		Sphere blueSphere = Sphere(vec3(-2, 0, -35), 3, vec3(0, 0, 255));
 		Sphere yellowSphere = Sphere(vec3(0, -37, -100), 40, vec3(255, 69, 0));
 
 		//Vector 
@@ -165,7 +190,7 @@ int main(int argc, char* argv[])
 
 		///light setting
 		vec3 lightSrc;
-		lightSrc.x = -2.0; lightSrc.y = 2.0; lightSrc.z = 0.0;
+		lightSrc.x = 1.0; lightSrc.y = 3.0; lightSrc.z = -1.0;
 
 		vector<float> saved_rayDists;
 		vector<vec3> saved_colour;
@@ -214,42 +239,60 @@ int main(int argc, char* argv[])
 					{
 						//Check distance of ray from camera and save colour for later
 						saved_rayDists.push_back(hit.rayDist);
-						hit.ambientCol = convertColour(blueSphere.getColour());
+						hit.ambientCol = convertColour(redSphere.getColour());
 						hit.diffuseCol = 0.7;
 						ComputeColorSphere(hit.ambientCol, hit.diffuseCol,lightSrc, redSphere.getPos(), hit.intersectPoint, rayDir, colVal);
-						//saved_colour.push_back();
-						drawPixel(pixels, x, y, colVal * 5000);
+						saved_colour.push_back(convertColourToVec(colVal));
+					}
+					if (sphereIntersection(blueSphere.getPos(), rayOrigin, rayDir, blueSphere.getRad(), hit))
+					{
+						//Check distance of ray from camera and save colour for later
+						saved_rayDists.push_back(hit.rayDist);
+						hit.ambientCol = convertColour(blueSphere.getColour());
+						hit.diffuseCol = 0.7;
+						ComputeColorSphere(hit.ambientCol, hit.diffuseCol, lightSrc, blueSphere.getPos(), hit.intersectPoint, rayDir, colVal);
+						saved_colour.push_back(convertColourToVec(colVal));
+					}
+					if (sphereIntersection(greenSphere.getPos(), rayOrigin, rayDir, greenSphere.getRad(), hit))
+					{
+						//Check distance of ray from camera and save colour for later
+						saved_rayDists.push_back(hit.rayDist);
+						hit.ambientCol = convertColour(greenSphere.getColour());
+						hit.diffuseCol = 0.7;
+						ComputeColorSphere(hit.ambientCol, hit.diffuseCol, lightSrc, greenSphere.getPos(), hit.intersectPoint, rayDir, colVal);
+						saved_colour.push_back(convertColourToVec(colVal));
 					}
 
 					
-					////If we don't hit anything, draw default colours
-					//if (saved_rayDists.size() == 0)
-					//{
-					//	framebuffer[x][y].x = 1.0;
-					//	framebuffer[x][y].y = 1.0;
-					//	framebuffer[x][y].z = 1.0;
-					//	
 
-					//	drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
+					//If we don't hit anything, draw default colours
+					if (saved_rayDists.size() == 0)
+					{
+						framebuffer[x][y].x = 0.0;
+						framebuffer[x][y].y = 0.0;
+						framebuffer[x][y].z = 0.0;
+						
 
-					//}
-					//else
-					//{
-					//	float minRayDist = 1000;
+						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
 
-					//	//Sort through hit objects and decide which ones to draw first
-					//	int whichone = 0;
-					//	for (int i = 0; i < saved_rayDists.size(); i++)
-					//	{
-					//		if (saved_rayDists[i] < minRayDist) { whichone = i; minRayDist = saved_rayDists[i]; }
-					//	}
-					//	framebuffer[x][y].x = saved_colour[whichone].x;
-					//	framebuffer[x][y].y = saved_colour[whichone].y;
-					//	framebuffer[x][y].z = saved_colour[whichone].z;
+					}
+					else
+					{
+						float minRayDist = 1000;
 
-					//	drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
+						//Sort through hit objects and decide which ones to draw first
+						int whichone = 0;
+						for (int i = 0; i < saved_rayDists.size(); i++)
+						{
+							if (saved_rayDists[i] < minRayDist) { whichone = i; minRayDist = saved_rayDists[i]; }
+						}
+						framebuffer[x][y].x = saved_colour[whichone].x;
+						framebuffer[x][y].y = saved_colour[whichone].y;
+						framebuffer[x][y].z = saved_colour[whichone].z;
 
-					//}
+						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
+
+					}
 					//Test raster method
 
 					/*if ((int)sqrt((y - redSphere.currRad) * (y - redSphere.currRad) + (x - redSphere.currRad) * (x - redSphere.currRad)) < redSphere.currRad)
