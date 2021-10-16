@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
 
 		//Calculate ray origin
 		vec3 rayOrigin = vec3(0, 0, 0);
-
+			 
 		//Used to transform the camera
 		vec3 camVec;
 
