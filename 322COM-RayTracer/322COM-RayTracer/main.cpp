@@ -1,4 +1,5 @@
 #include "sphere.h"
+#include "plane.h"
 #include <iostream>
 #include <algorithm>
 #include <fstream>     
@@ -22,7 +23,7 @@ SDL_Event event;
 //Rendering width/height/FOV
 int width = 640;
 int height = 480;
-float fov = 60;
+float fov = 120;
 
 
 int pitch;
@@ -79,6 +80,19 @@ void drawPixel(Uint32*& pixels, int x, int y, Uint32 colour)
 	pixels[y * width + x] = colour;
 }
 
+bool shadowCalc(vec3 lightSrc, vec3 IntPoint, shape *currShape, rayHit &shadowHit)
+{
+	//Calculate ray direction
+	vec3 dir = lightSrc - IntPoint;
+
+	//If we hit an object that should be in shadow
+	if(currShape->intersection(IntPoint, dir, shadowHit))
+	{
+		//Make it so
+		return true;
+	}
+	return false;
+}
 
 int main(int argc, char* argv[])
 {
@@ -115,10 +129,15 @@ int main(int argc, char* argv[])
 		//Instance of sphere		//Pos		Radius		//Colour   //D  S  intensity
 		Sphere redSphere = Sphere(vec3(0, 0, -10), 0.5, vec3(255, 0, 0), 0, 1.2);
 		Sphere greenSphere = Sphere(vec3(2, -1, -20), 1, vec3(0, 255, 0), 0, 1.2);
+
+		//Instance of plane			//Pos		//Point on plane	//Normal
+		plane testPlane = plane(vec3(0, 255, 0), vec3(0, -1, 0), vec3(0, 1, 0));
+		
 		
 		//Add them into our vector
 		shapes.push_back(&redSphere);
 		shapes.push_back(&greenSphere);
+		shapes.push_back(&testPlane);
 
 		//Where we store our image
 		vec3** framebuffer = new vec3 * [width];
@@ -132,7 +151,7 @@ int main(int argc, char* argv[])
 
 		///light setting
 		vec3 lightSrc;
-		lightSrc.x = 10.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
+		lightSrc.x = 15.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
 		vec3 lightIntensity = vec3(0.1, 0.1, 0.1);
 
 
@@ -178,6 +197,7 @@ int main(int argc, char* argv[])
 
 					//Written to and saved with each intersection check
 					rayHit hit;
+					rayHit shadowHit;
 					vec3 colVal;
 
 
@@ -193,6 +213,13 @@ int main(int argc, char* argv[])
 							//Calculate colour and push onto vector for later
 							shapes[currShape]->ComputeColour(lightIntensity, 1, hit.ambientCol, hit.diffuseCol, lightSrc, hit.intersectPoint, shapes[currShape]->currPos, rayDir, colVal);
 							saved_colour.push_back(colVal);
+
+							//Shadow calculation
+							if(shadowCalc(lightSrc, hit.intersectPoint, shapes[currShape], shadowHit))
+							{
+								saved_rayDists.push_back(shadowHit.rayDist);
+								saved_colour.push_back(vec3(0, 0, 0));
+							}
 						}
 					}
 

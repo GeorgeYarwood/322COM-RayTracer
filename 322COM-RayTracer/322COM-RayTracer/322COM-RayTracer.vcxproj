@@ -148,11 +148,13 @@
   <ItemGroup>
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="plane.cpp" />
     <ClCompile Include="shape.cpp" />
     <ClCompile Include="sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="light.h" />
+    <ClInclude Include="plane.h" />
     <ClInclude Include="rayHit.h" />
     <ClInclude Include="shape.h" />
     <ClInclude Include="sphere.h" />
