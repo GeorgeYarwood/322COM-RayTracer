@@ -80,13 +80,15 @@ void drawPixel(Uint32*& pixels, int x, int y, Uint32 colour)
 	pixels[y * width + x] = colour;
 }
 
-bool shadowCalc(vec3 lightSrc, vec3 IntPoint, shape *currShape, rayHit &shadowHit)
+bool shadowCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape *currShape, rayHit &shadowHit)
 {
 	//Calculate ray direction
-	vec3 dir = lightSrc - IntPoint;
-
+	vec3 l = -lightSrc;
+	vec3 normal = (normalize(IntPoint - currShape->currPos));
+	normalize(l);
+	vec3 test = IntPoint + -normal;
 	//If we hit an object that should be in shadow
-	if(currShape->intersection(IntPoint, dir, shadowHit))
+	if(currShape->intersection(test, l, shadowHit))
 	{
 		//Make it so
 		return true;
@@ -127,11 +129,11 @@ int main(int argc, char* argv[])
 		vector<shape*>shapes;
 
 		//Instance of sphere		//Pos		Radius		//Colour   //D  S  intensity
-		Sphere redSphere = Sphere(vec3(0, 0, -10), 0.5, vec3(255, 0, 0), 0, 1.2);
-		Sphere greenSphere = Sphere(vec3(2, -1, -20), 1, vec3(0, 255, 0), 0, 1.2);
+		Sphere redSphere = Sphere(vec3(0, 1, -10), 0.5, vec3(255, 0, 0), 0, 1.2);
+		Sphere greenSphere = Sphere(vec3(2, 0, -20), 1, vec3(0, 255, 0), 0, 1.2);
 
-		//Instance of plane			//Pos		//Point on plane	//Normal
-		plane testPlane = plane(vec3(0, 255, 0), vec3(0, -1, 0), vec3(0, 1, 0));
+		//Instance of plane			//Col		//Point on plane	//Normal
+		plane testPlane = plane(vec3(10, 10, 10), vec3(0, 1, -10), vec3(0, -1, 0));
 		
 		
 		//Add them into our vector
@@ -151,7 +153,7 @@ int main(int argc, char* argv[])
 
 		///light setting
 		vec3 lightSrc;
-		lightSrc.x = 15.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
+		lightSrc.x = 0.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
 		vec3 lightIntensity = vec3(0.1, 0.1, 0.1);
 
 
@@ -215,7 +217,7 @@ int main(int argc, char* argv[])
 							saved_colour.push_back(colVal);
 
 							//Shadow calculation
-							if(shadowCalc(lightSrc, hit.intersectPoint, shapes[currShape], shadowHit))
+							if(shadowCalc(lightSrc, rayDir, hit.intersectPoint, shapes[currShape], shadowHit))
 							{
 								saved_rayDists.push_back(shadowHit.rayDist);
 								saved_colour.push_back(vec3(0, 0, 0));
@@ -249,7 +251,6 @@ int main(int argc, char* argv[])
 						framebuffer[x][y].z = saved_colour[whichone].z;
 
 						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
-
 					}
 					//Test raster method
 

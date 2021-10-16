@@ -19,12 +19,14 @@ bool plane::intersection(vec3& orig, vec3& dir, rayHit& hit)
 	{
 		vec3 pointtoray = currPoint - orig;
 
-		hit.rayDist = dot(pointtoray, currNormal) / denominator;
-
+		hit.rayDist = dot(pointtoray, dir) / denominator;
+		//hit.rayDist = 12;
+		
+		
 		hit.intersectPoint = orig + dir * hit.rayDist;
 
 		 
-		return(hit.rayDist >= 0);
+		return(hit.rayDist >=0);
 	}
 
 
