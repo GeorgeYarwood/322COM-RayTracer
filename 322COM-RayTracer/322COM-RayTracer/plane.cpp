@@ -15,6 +15,7 @@ bool plane::intersection(vec3& orig, vec3& dir, rayHit& hit)
 	normalize(currNormal);
 
 	float denominator = dot(currNormal, dir);
+	abs(denominator);
 	if(denominator > 1e-6)
 	{
 		vec3 pointtoray = currPoint - orig;

@@ -86,7 +86,7 @@ bool shadowCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape *currShape, rayHit 
 	vec3 l = -lightSrc;
 	vec3 normal = (normalize(IntPoint - currShape->currPos));
 	normalize(l);
-	vec3 test = IntPoint + -normal;
+	vec3 test = -IntPoint + normal;
 	//If we hit an object that should be in shadow
 	if(currShape->intersection(test, l, shadowHit))
 	{
@@ -219,8 +219,10 @@ int main(int argc, char* argv[])
 							//Shadow calculation
 							if(shadowCalc(lightSrc, rayDir, hit.intersectPoint, shapes[currShape], shadowHit))
 							{
-								saved_rayDists.push_back(shadowHit.rayDist);
-								saved_colour.push_back(vec3(0, 0, 0));
+								//saved_rayDists.push_back(shadowHit.rayDist);
+								//saved_colour.push_back(vec3(0, 0, 0));
+								drawPixel(pixels, x, y, convertColour(vec3(0,0,0)));
+
 							}
 						}
 					}
