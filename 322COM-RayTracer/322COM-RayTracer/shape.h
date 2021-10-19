@@ -19,5 +19,7 @@ public:
 	
 	float currDiffuseIntensity;
 	float currSpecIntensity;
+	bool inShadow;
+
 };
 

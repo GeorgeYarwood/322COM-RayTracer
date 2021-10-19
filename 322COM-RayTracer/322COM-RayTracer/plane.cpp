@@ -9,23 +9,19 @@ plane::plane(vec3 col, vec3 point, vec3 normal)
 
 bool plane::intersection(vec3& orig, vec3& dir, rayHit& hit)
 {
-
-	normalize(orig);
-	normalize(currPoint);
-	normalize(currNormal);
-
 	float denominator = dot(currNormal, dir);
-	if(denominator > 1e-6)
+	if(abs(denominator) > 1e-6)
 	{
 		vec3 pointtoray = currPoint - orig;
 
-		hit.rayDist = dot(pointtoray, dir) / abs(denominator);
+		hit.rayDist = dot(pointtoray, dir) / (denominator);
 		
 		//hit.rayDist = 12;
 		
 		
-		hit.intersectPoint = orig + dir * hit.rayDist;
-
+		hit.intersectPoint.x = orig.x + dir.x * hit.rayDist;
+		hit.intersectPoint.y = orig.y + dir.y * hit.rayDist;
+		hit.intersectPoint.z = orig.z + dir.z * hit.rayDist;
 		 
 		return(hit.rayDist >=0);
 	}

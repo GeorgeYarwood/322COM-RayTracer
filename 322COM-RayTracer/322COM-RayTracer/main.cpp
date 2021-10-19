@@ -83,12 +83,11 @@ void drawPixel(Uint32*& pixels, int x, int y, Uint32 colour)
 bool shadowCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape *currShape, rayHit &shadowHit)
 {
 	//Calculate ray direction
-	vec3 l = -lightSrc;
+	vec3 l =  lightSrc - IntPoint;
 	vec3 normal = (normalize(IntPoint - currShape->currPos));
-	normalize(l);
-	vec3 test = -IntPoint + normal;
+	l = normalize(l);
 	//If we hit an object that should be in shadow
-	if(currShape->intersection(test, l, shadowHit))
+	if(currShape->intersection(IntPoint, l, shadowHit))
 	{
 		//Make it so
 		return true;
@@ -133,7 +132,7 @@ int main(int argc, char* argv[])
 		Sphere greenSphere = Sphere(vec3(2, 0, -20), 1, vec3(0, 255, 0), 0, 1.2);
 
 		//Instance of plane			//Col		//Point on plane	//Normal
-		plane testPlane = plane(vec3(0, 255, 0), vec3(0, 1, -10), vec3(0, -1, 0));
+		plane testPlane = plane(vec3(0, 255, 0), vec3(0, 1, -20), vec3(0, -1, 0));
 		
 		
 		//Add them into our vector
@@ -202,6 +201,7 @@ int main(int argc, char* argv[])
 					rayHit shadowHit;
 					vec3 colVal;
 
+					bool inShadow = false;
 
 					//For every shape in the vector
 					for(int currShape = 0; currShape < shapes.size(); currShape++)
@@ -209,27 +209,49 @@ int main(int argc, char* argv[])
 						//Run intersection check
 						if (shapes[currShape]->intersection(rayOrigin, rayDir, hit))
 						{
-							//If we hit, save our ray
-							saved_rayDists.push_back(hit.rayDist);
-							hit.ambientCol = shapes[currShape]->currColour;
-							//Calculate colour and push onto vector for later
-							shapes[currShape]->ComputeColour(lightIntensity, 1, hit.ambientCol, hit.diffuseCol, lightSrc, hit.intersectPoint, shapes[currShape]->currPos, rayDir, colVal);
-							saved_colour.push_back(colVal);
-
-							//Shadow calculation
-							if(shadowCalc(lightSrc, rayDir, hit.intersectPoint, shapes[currShape], shadowHit))
+							for (int j = 0; j < shapes.size(); j++)
 							{
-								//saved_rayDists.push_back(shadowHit.rayDist);
-								//
-								//saved_colour.push_back(vec3(0, 0, 0));
-								//drawPixel(pixels, x, y, convertColour(vec3(0,0,0)));
+								if (currShape == j) continue;
 
+								//Shadow calculation
+								if (shadowCalc(lightSrc, rayDir, hit.intersectPoint, shapes[j], shadowHit))
+								{
+									//saved_rayDists.push_back(shadowHit.rayDist);
+									//
+									inShadow = true;
+									break;
+									//saved_colour.push_back(vec3(0, 0, 0));
+
+								}
 							}
+
+							if (!inShadow)
+							{
+								//If we hit, save our ray
+								saved_rayDists.push_back(hit.rayDist);
+								hit.ambientCol = shapes[currShape]->currColour;
+								//Calculate colour and push onto vector for later
+								shapes[currShape]->ComputeColour(lightIntensity, 1, hit.ambientCol, hit.diffuseCol, lightSrc, hit.intersectPoint, shapes[currShape]->currPos, rayDir, colVal);
+								saved_colour.push_back(colVal);
+							}
+
+							
 						}
 					}
 
+					if (inShadow)
+					{
+					
+						framebuffer[x][y].x = 0.0;
+						framebuffer[x][y].y = 0.0;
+						framebuffer[x][y].z = 0.0;
+
+
+						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));
+
+					}
 					//If we don't hit anything, draw default colours
-					if (saved_rayDists.size() == 0)
+					else if (saved_rayDists.size() == 0)
 					{
 						framebuffer[x][y].x = 1.0;
 						framebuffer[x][y].y = 1.0;
