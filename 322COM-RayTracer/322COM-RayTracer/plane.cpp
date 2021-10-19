@@ -15,12 +15,12 @@ bool plane::intersection(vec3& orig, vec3& dir, rayHit& hit)
 	normalize(currNormal);
 
 	float denominator = dot(currNormal, dir);
-	abs(denominator);
 	if(denominator > 1e-6)
 	{
 		vec3 pointtoray = currPoint - orig;
 
-		hit.rayDist = dot(pointtoray, dir) / denominator;
+		hit.rayDist = dot(pointtoray, dir) / abs(denominator);
+		
 		//hit.rayDist = 12;
 		
 		

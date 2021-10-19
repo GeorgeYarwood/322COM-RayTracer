@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 		Sphere greenSphere = Sphere(vec3(2, 0, -20), 1, vec3(0, 255, 0), 0, 1.2);
 
 		//Instance of plane			//Col		//Point on plane	//Normal
-		plane testPlane = plane(vec3(10, 10, 10), vec3(0, 1, -10), vec3(0, -1, 0));
+		plane testPlane = plane(vec3(0, 255, 0), vec3(0, 1, -10), vec3(0, -1, 0));
 		
 		
 		//Add them into our vector
@@ -220,8 +220,9 @@ int main(int argc, char* argv[])
 							if(shadowCalc(lightSrc, rayDir, hit.intersectPoint, shapes[currShape], shadowHit))
 							{
 								//saved_rayDists.push_back(shadowHit.rayDist);
+								//
 								//saved_colour.push_back(vec3(0, 0, 0));
-								drawPixel(pixels, x, y, convertColour(vec3(0,0,0)));
+								//drawPixel(pixels, x, y, convertColour(vec3(0,0,0)));
 
 							}
 						}
