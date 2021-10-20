@@ -39,7 +39,7 @@ void plane::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec
 
 	//Calculate normal value and light ray
 	lightToPt = normalize(sourcePt - IntPt);
-	surNorm = normalize(IntPt - currPos);
+	surNorm = normalize(currNormal);
 
 	//Ambient light
 	ambCol.r *= ambLightIntensity.r;
@@ -51,7 +51,15 @@ void plane::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec
 	diffColour = ambCol * ambLightIntensity * std::max(0.0f, dot(lightToPt, surNorm));
 
 	
+	//compute specular value
+	vecdot = dot(surNorm, lightToPt);
+	ttvec.x = surNorm.x * 2.0 * vecdot;
+	ttvec.y = surNorm.y * 2.0 * vecdot;
+	ttvec.z = surNorm.z * 2.0 * vecdot;
 
+	rVec = ttvec - lightToPt;
+	tt = std::max(0.0, (double)dot(rVec, -dir));
+	Cs = pow(tt, 20) * currSpecIntensity;
 	//ColValue = Cs;
 	ColValue = diffColour ;
 }

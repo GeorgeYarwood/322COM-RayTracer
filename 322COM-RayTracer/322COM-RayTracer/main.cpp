@@ -87,8 +87,9 @@ bool shadowCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape *currShape, rayHit 
 	vec3 l =  lightSrc - IntPoint;
 	vec3 normal = (normalize(IntPoint - currShape->currPos));
 	l = normalize(l);
+	vec3 orig = IntPoint + normal * 0.00001f;
 	//If we hit an object that should be in shadow
-	if(currShape->intersection(IntPoint, l, shadowHit))
+	if(currShape->intersection(orig, l, shadowHit))
 	{
 		//Make it so
 		return true;
@@ -136,7 +137,7 @@ int main(int argc, char* argv[])
 		plane testPlane = plane(vec3(0, 255, 0), vec3(0, -1, 0), vec3(0, 1, 0));
 		
 		//Triangle
-		triangle testTriangle = triangle(vec3(0, 1, -2), vec3(-1.9, -1, -2), vec3(1.6, -0.5, -2),0.2,0.4, vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 255, 0), 0, 0);
+		triangle testTriangle = triangle(vec3(0, 1, -2), vec3(-1.9, -1, -2), vec3(1.6, -0.5,-2),0.4,0.4, vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 10);
 		//Add them into our vector
 		shapes.push_back(&redSphere);
 		shapes.push_back(&greenSphere);
@@ -155,7 +156,7 @@ int main(int argc, char* argv[])
 
 		///light setting
 		vec3 lightSrc;
-		lightSrc.x = 0.0; lightSrc.y = 20.0; lightSrc.z = 0.0;
+		lightSrc.x = 0.0; lightSrc.y = 100.0; lightSrc.z = 0.0;
 		vec3 lightIntensity = vec3(0.1, 0.1, 0.1);
 
 
