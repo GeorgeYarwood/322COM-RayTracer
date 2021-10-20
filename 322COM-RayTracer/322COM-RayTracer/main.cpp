@@ -1,5 +1,6 @@
 #include "sphere.h"
 #include "plane.h"
+#include "triangle.h"
 #include <iostream>
 #include <algorithm>
 #include <fstream>     
@@ -23,7 +24,7 @@ SDL_Event event;
 //Rendering width/height/FOV
 int width = 640;
 int height = 480;
-float fov = 120;
+float fov = 300;
 
 
 int pitch;
@@ -134,11 +135,13 @@ int main(int argc, char* argv[])
 		//Instance of plane			//Col		//Point on plane	//Normal
 		plane testPlane = plane(vec3(0, 255, 0), vec3(0, -1, 0), vec3(0, 1, 0));
 		
-		
+		//Triangle
+		triangle testTriangle = triangle(vec3(0, 1, -2), vec3(-1.9, -1, -2), vec3(1.6, -0.5, -2),0.2,0.4, vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 255, 0), 0, 0);
 		//Add them into our vector
 		shapes.push_back(&redSphere);
 		shapes.push_back(&greenSphere);
 		shapes.push_back(&testPlane);
+		shapes.push_back(&testTriangle);
 
 		//Where we store our image
 		vec3** framebuffer = new vec3 * [width];
@@ -230,7 +233,7 @@ int main(int argc, char* argv[])
 								saved_rayDists.push_back(hit.rayDist);
 								hit.ambientCol = shapes[currShape]->currColour;
 								//Calculate colour and push onto vector for later
-								shapes[currShape]->ComputeColour(lightIntensity, 1, hit.ambientCol, hit.diffuseCol, lightSrc, hit.intersectPoint, shapes[currShape]->currPos, rayDir, colVal);
+								shapes[currShape]->ComputeColour(lightIntensity,lightSrc, hit.intersectPoint, rayDir, colVal);
 								saved_colour.push_back(colVal);
 							}
 

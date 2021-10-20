@@ -9,15 +9,17 @@ bool shape::intersection(vec3& orig, vec3& dir, rayHit& hit)
 	return true;
 }
 
-void shape::ComputeColour(vec3 ambLightIntensity, float specIntensity, vec3 ambCol, vec3 diffColour, const vec3 sourcePt, const vec3 IntPt, const vec3 CenPt, const vec3 dir, vec3& ColValue)
+void shape::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec3 IntPt, const vec3 dir, vec3& ColValue)
 {
-	vec3 lightToPt, surNorm, rVec, ttvec;
+	vec3 lightToPt, surNorm, rVec, ttvec, ambCol, diffColour;
 	float Cs, tt; //Ca for ambient colour; //Cd for diffuse colour; //Cs for specular highlights
 	float vecdot;
 
+	ambCol = currColour;
+
 	//Calculate normal value and light ray
 	lightToPt = normalize(sourcePt - IntPt);
-	surNorm = normalize(IntPt - CenPt);
+	surNorm = normalize(IntPt - currPos);
 
 	//Ambient light
 	ambCol.r *= ambLightIntensity.r;
@@ -36,7 +38,7 @@ void shape::ComputeColour(vec3 ambLightIntensity, float specIntensity, vec3 ambC
 
 	rVec = ttvec - lightToPt;
 	tt = std::max(0.0, (double)dot(rVec, -dir));
-	Cs = pow(tt, 20) * specIntensity;
+	Cs = pow(tt, 20) * currSpecIntensity;
 
 	//ColValue = Cs;
 	ColValue = diffColour + Cs;
