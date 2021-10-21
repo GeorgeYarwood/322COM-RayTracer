@@ -1,15 +1,14 @@
 
 #include "triangle.h"
 
-triangle::triangle(vec3 pos, vec3 v0, vec3 v1, vec3 v2, float u, float v, vec3 col, vec3 col1,vec3 col2, vec3 norm0, vec3 norm1, vec3 norm2,float diffIntensity, float specIntensity)
+triangle::triangle(vec3 pos, vec3 v0, vec3 v1, vec3 v2, vec3 col, vec3 col1,vec3 col2, vec3 norm0, vec3 norm1, vec3 norm2,float diffIntensity, float specIntensity)
 {
     currPos = pos;
 
     currV0 = v0+ currPos;
     currV1 = v1+ currPos;
     currV2 = v2+ currPos;
-    currU = u;
-    currV = v;
+   
 
     currNorm0 = norm0;
     currNorm1 = norm1;

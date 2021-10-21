@@ -6,7 +6,7 @@ class triangle :
 {
 
 public:
-    triangle(vec3 pos, vec3 v0, vec3 v1, vec3 v2, float u, float v, vec3 col, vec3 col1, vec3 col2, vec3 norm0, vec3 norm1, vec3 norm2, float diffIntensity, float specIntensity);
+    triangle(vec3 pos, vec3 v0, vec3 v1, vec3 v2, vec3 col, vec3 col1, vec3 col2, vec3 norm0, vec3 norm1, vec3 norm2, float diffIntensity, float specIntensity);
     vec3 currColour1;
     vec3 currColour2;
     vec3 currV0;
