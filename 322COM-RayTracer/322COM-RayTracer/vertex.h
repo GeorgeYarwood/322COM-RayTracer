@@ -15,7 +15,13 @@ struct VertexWtihNormal
 	glm::vec3 normals;
 };
 
-struct  VertexWithAll
+struct triVertex
+{
+	glm::vec3 vertex;
+	glm::vec3 normal;
+};
+
+struct VertexWithAll
 {
 	glm::vec3 position;
 	glm::vec3 color;

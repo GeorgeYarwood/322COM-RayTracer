@@ -1,11 +1,13 @@
 
 #include "triangle.h"
 
-triangle::triangle(vec3 v0, vec3 v1, vec3 v2, float u, float v, vec3 col, vec3 col1,vec3 col2, vec3 norm0, vec3 norm1, vec3 norm2,float diffIntensity, float specIntensity)
+triangle::triangle(vec3 pos, vec3 v0, vec3 v1, vec3 v2, float u, float v, vec3 col, vec3 col1,vec3 col2, vec3 norm0, vec3 norm1, vec3 norm2,float diffIntensity, float specIntensity)
 {
-    currV0 = v0;
-    currV1 = v1;
-    currV2 = v2;
+    currPos = pos;
+
+    currV0 = v0+ currPos;
+    currV1 = v1+ currPos;
+    currV2 = v2+ currPos;
     currU = u;
     currV = v;
 
@@ -34,7 +36,7 @@ bool triangle::intersection(vec3& orig, vec3& dir, rayHit& hit)
 
     // check if ray and plane are parallel ?
     float NdotRayDirection = dot(N, dir);
-    if (fabs(NdotRayDirection) < 1e-8) // almost 0 
+    if (abs(NdotRayDirection) < 0.00001) // almost 0 
         return false; // they are parallel so they don't intersect ! 
 
     // compute d parameter using equation 2
@@ -46,26 +48,26 @@ bool triangle::intersection(vec3& orig, vec3& dir, rayHit& hit)
     if (hit.rayDist < 0) return false; // the triangle is behind 
 
     // compute the intersection point using equation 1
-    vec3 P = orig + hit.rayDist * dir;
+    hit.intersectPoint = orig + hit.rayDist * dir;
 
     // Step 2: inside-outside test
     vec3 C; // vector perpendicular to triangle's plane 
 
     // edge 0
     vec3 edge0 = currV1 - currV0;
-    vec3 vp0 = P - currV0;
+    vec3 vp0 = hit.intersectPoint - currV0;
     C = cross(edge0, vp0);
     if (dot(N,C) < 0) return false; // P is on the right side 
 
     // edge 1
     vec3 edge1 = currV2 - currV1;
-    vec3 vp1 = P - currV1;
+    vec3 vp1 = hit.intersectPoint - currV1;
     C = cross(edge1, vp1);
     if ((currU = dot(N, C)) < 0)  return false; // P is on the right side 
 
     // edge 2
     vec3 edge2 = currV0 - currV2;
-    vec3 vp2 = P - currV2;
+    vec3 vp2 = hit.intersectPoint - currV2;
     C = cross(edge2, vp2);
     if ((currV = dot(N, C)) < 0) return false; // P is on the right side; 
 

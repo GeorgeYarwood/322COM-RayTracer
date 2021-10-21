@@ -15,9 +15,9 @@
 //MINE LIBS
 #include "Vertex.h"
 
-static std::vector<VertexWithAll> loadOBJ(const char* file_name)
+static std::vector<VertexWithAll> loadOBJ(std::string file_name)
 {
-
+	const char* name = file_name.c_str();
 	//vertex portions
 	std::vector<glm::fvec3> vertex_positions;
 	std::vector<glm::fvec2> vertex_textcoords;
@@ -32,7 +32,7 @@ static std::vector<VertexWithAll> loadOBJ(const char* file_name)
 	std::vector<VertexWithAll> vertices;
 
 	std::stringstream ss;
-	std::ifstream in_file(file_name);
+	std::ifstream in_file(name);
 	std::string line = "";
 	std::string prefix = "";
 	glm::vec3 temp_vec3;
@@ -140,7 +140,7 @@ static std::vector<VertexWithAll> loadOBJ(const char* file_name)
 	{
 
 		vertices[i].position = vertex_positions[vertex_position_indicies[i] - 1];
-		vertices[i].textcoord = vertex_textcoords[vertex_textcoord_indicies[i] - 1];
+		//vertices[i].textcoord = vertex_textcoords[vertex_textcoord_indicies[i] - 1];
 		vertices[i].normal = vertex_normals[vertex_normal_indicies[i] - 1];
 		vertices[i].color = glm::vec3(1.f, 1.f, 1.f);
 	}
