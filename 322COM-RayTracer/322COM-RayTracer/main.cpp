@@ -25,7 +25,7 @@ SDL_Event event;
 //Rendering width/height/FOV
 int width = 640;
 int height = 480;
-float fov = 110;
+float fov = 300;
 
 
 int pitch;
@@ -138,22 +138,37 @@ int main(int argc, char* argv[])
 		plane testPlane = plane(vec3(0, 255, 0), vec3(0, -1, 0), vec3(0, 1, 0));
 		
 		//Triangle
-		triangle testTriangle = triangle(vec3(-2, 0, -15),vec3(0, 1, -2), vec3(-1.9, -1, -2), vec3(1.6, -0.5,-2), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
+		triangle testTri1 = triangle(vec3(0, 0,-5),vec3(1, 1, 1), vec3(1, 1, -1), vec3(1, 1,1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
+		triangle testTri2 = triangle(vec3(0, 0, -5),vec3(-1, -1, 1), vec3(1, -1, 1), vec3(-1, 1,1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
+		triangle testTri3 = triangle(vec3(0, 0, -5),vec3(-1, -1, -1), vec3(-1, -1, 1), vec3(1, -1,-1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
+		triangle testTri4 = triangle(vec3(0, 0, -5),vec3(-1, -1, 1), vec3(-1, -1, -1), vec3(1, 1,-1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
+		triangle testTri5 = triangle(vec3(0, 0, -5),vec3(1, -1, 1), vec3(1, -1, -1), vec3(-1, 1,-1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
+		triangle testTri6 = triangle(vec3(0, 0, -5),vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1,-1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
+		
 		std::vector<VertexWithAll> mesh = loadOBJ("cube.obj");
+
+
+
 
 		for(int m = 0; m< mesh.size(); m+=3)
 		{
 			
-			triangle tr = triangle(vec3(0,0,-8),mesh[m].position, mesh[m+1].position, mesh[m+2].position, vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), mesh[m].normal, mesh[m+1].normal, mesh[m+2].normal, 1, 1);
-			shapes.push_back(&tr);
+			//triangle tr = triangle(vec3(0,0,-5),mesh[m].position, mesh[m+1].position, mesh[m+2].position, vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), mesh[m].normal, mesh[m+1].normal, mesh[m+2].normal, 1, 1);
+			//shapes.push_back(&tr);
+			//cout << &tr.currV0 << &tr.currV1 << &tr.currV2;
 			
 		}
 
 		//Add them into our vector
-		shapes.push_back(&redSphere);
-		shapes.push_back(&greenSphere);
-		shapes.push_back(&testPlane);
-		shapes.push_back(&testTriangle);
+		//shapes.push_back(&redSphere);
+		//shapes.push_back(&greenSphere);
+		//shapes.push_back(&testPlane);
+		shapes.push_back(&testTri1);
+		shapes.push_back(&testTri2);
+		shapes.push_back(&testTri3);
+		shapes.push_back(&testTri4);
+		shapes.push_back(&testTri5);
+		shapes.push_back(&testTri6);
 
 		cout << shapes.size();
 

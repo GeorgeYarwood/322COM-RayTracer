@@ -24,7 +24,7 @@ void shape::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec
 	//Ambient light
 	ambCol.r *= ambLightIntensity.r;
 	ambCol.g *= ambLightIntensity.g;
-	ambCol.b *= ambLightIntensity.b;;
+	ambCol.b *= ambLightIntensity.b;
 
 
 	//Diffuse lighting calculation
