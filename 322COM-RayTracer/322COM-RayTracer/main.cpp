@@ -141,13 +141,13 @@ int main(int argc, char* argv[])
 		triangle testTriangle = triangle(vec3(-2, 0, -15),vec3(0, 1, -2), vec3(-1.9, -1, -2), vec3(1.6, -0.5,-2), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
 		std::vector<VertexWithAll> mesh = loadOBJ("cube.obj");
 
-		/*for(int m = 0; m< mesh.size(); m+=3)
+		for(int m = 0; m< mesh.size(); m+=3)
 		{
 			
-			triangle tr = triangle(vec3(0,0,-1),mesh[m].position, mesh[m+1].position, mesh[m+2].position, vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), mesh[m].normal, mesh[m+1].normal, mesh[m+2].normal, 1, 1);
+			triangle tr = triangle(vec3(0,0,-8),mesh[m].position, mesh[m+1].position, mesh[m+2].position, vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), mesh[m].normal, mesh[m+1].normal, mesh[m+2].normal, 1, 1);
 			shapes.push_back(&tr);
 			
-		}*/
+		}
 
 		//Add them into our vector
 		shapes.push_back(&redSphere);
@@ -295,10 +295,10 @@ int main(int argc, char* argv[])
 					}
 					//Test raster method
 
-					/*if ((int)sqrt((y - redSphere.currRad) * (y - redSphere.currRad) + (x - redSphere.currRad) * (x - redSphere.currRad)) < redSphere.currRad)
-					{
-						 =2988;
-					}*/
+					//if ((int)sqrt((y - redSphere.currRad) * (y - redSphere.currRad) + (x - redSphere.currRad) * (x - redSphere.currRad)) < redSphere.currRad)
+					//{
+					//	pixels[y * width + x] =2988;
+					//}
 
 				}
 			}
