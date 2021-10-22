@@ -318,7 +318,27 @@ int main(int argc, char* argv[])
 				{
 					quit = true;
 				}
+				else if(event.type == SDL_KEYDOWN)
+				{
+					switch(event.key.keysym.sym)
+					{
+						case SDLK_RIGHT:
+							rayOrigin.x += 1;
+							break;
+						case SDLK_LEFT:
+							rayOrigin.x -= 1;
+							break;
+						case SDLK_UP:
+							rayOrigin.z -= 1;
+							break;
+						case SDLK_DOWN:
+							rayOrigin.z += 1;
+							break;
+					}
+				}
 			}
+
+
 
 			//Clear the renderer
 			SDL_RenderClear(sdlRenderer);
