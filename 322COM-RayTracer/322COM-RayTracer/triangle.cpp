@@ -55,7 +55,7 @@ bool triangle::intersection(vec3& orig, vec3& dir, rayHit& hit)
 
 }
 
-void triangle::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec3 IntPt, const vec3 dir, vec3& ColValue)
+vec3 triangle::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec3 IntPt, const vec3 dir)
 {
 
     vec3 lightToPt, surNorm, rVec, ttvec, ambCol, diffColour;
@@ -88,7 +88,7 @@ void triangle::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const 
     Cs = pow(tt, 20) * currSpecIntensity;
 
     //ColValue = Cs;
-    ColValue = diffColour + Cs;
+    return diffColour + Cs;
 
 }
 

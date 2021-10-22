@@ -19,7 +19,7 @@ public:
     float currU;
     float currV;
     bool intersection(vec3& orig, vec3& dir, rayHit& hit) override;
-    void ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec3 IntPt, const vec3 dir, vec3& ColValue) override;
+    vec3 ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec3 IntPt, const vec3 dir) override;
     
 };
 

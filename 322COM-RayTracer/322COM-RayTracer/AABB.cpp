@@ -1,9 +1,10 @@
 #include "AABB.h"
 
-AABB::AABB(glm::vec3 min, glm::vec3 max)
+AABB::AABB(glm::vec3 min, glm::vec3 max, shape &shape)
 {
     pMin = min;
     pMax = max;
+	currShape = &shape;	
 }
 
 

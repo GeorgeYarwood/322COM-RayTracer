@@ -29,7 +29,7 @@ bool plane::intersection(vec3& orig, vec3& dir, rayHit& hit)
 
 	return false;
 }
-void plane::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec3 IntPt, const vec3 dir, vec3& ColValue)
+vec3 plane::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec3 IntPt, const vec3 dir)
 {
 	vec3 lightToPt, surNorm, rVec, ttvec, ambCol, diffColour;
 	float Cs, tt; //Ca for ambient colour; //Cd for diffuse colour; //Cs for specular highlights
@@ -61,5 +61,5 @@ void plane::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec
 	tt = std::max(0.0, (double)dot(rVec, -dir));
 	Cs = pow(tt, 20) * currSpecIntensity;
 	//ColValue = Cs;
-	ColValue = diffColour ;
+	return diffColour +Cs;
 }

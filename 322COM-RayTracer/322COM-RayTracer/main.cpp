@@ -11,6 +11,7 @@
 #include "light.h"
 #include "rayHit.h"
 #include "OBJloader.h"
+#include "AABB.h";
 using namespace std;
 using namespace glm;
 
@@ -23,8 +24,8 @@ SDL_Renderer* sdlRenderer;
 SDL_Event event;
 
 //Rendering width/height/FOV
-int width = 640;
-int height = 480;
+int width = 1280;
+int height = 720;
 float fov = 110;
 
 
@@ -84,6 +85,10 @@ void drawPixel(Uint32*& pixels, int x, int y, Uint32 colour)
 
 bool shadowCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape *currShape, rayHit &shadowHit)
 {
+	if(!currShape->inShadow)
+	{
+		return false;
+	}
 	//Calculate ray direction
 	vec3 l =  lightSrc - IntPoint;
 	vec3 normal = (normalize(IntPoint - currShape->currPos));
@@ -106,7 +111,12 @@ bool reflectCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape* currShape, rayHit
 	//Calculate ray direction
 	vec3 l = dir - 2 * dot(normalize(dir), normalize(normal)) * normal;
 	vec3 orig = IntPoint + normal * 0.0001f;
-	
+	if (currShape->intersection(orig, l, reflectHit))
+	{
+		
+		//Make it so
+		return true;
+	}
 
 	return false;
 }
@@ -141,28 +151,36 @@ int main(int argc, char* argv[])
 		//Set background colour to white
 		//memset(pixels, 155, width * height * sizeof(Uint32));
 
+
+		vector<light*>lights;
 		//Vector of shapes we iterate through
 		vector<shape*>shapes;
 
+
 		//Instance of sphere		//Pos		Radius		//Colour   //D  S  intensity
-		Sphere redSphere = Sphere(vec3(0, 1, -10), 0.5, vec3(255, 0, 0), 0, 1.2);
-		Sphere greenSphere = Sphere(vec3(2, 0, -11), 1, vec3(0, 255, 0), 0, 1.2);
+		Sphere redSphere = Sphere(vec3(-2, 1, -10), 0.5, vec3(255, 0, 0), 0, 1.2);
+		Sphere greenSphere = Sphere(vec3(2, 0, -10), 0.5, vec3(0, 255, 0), 0, 1.2);
+		Sphere blueSphere = Sphere(vec3(-3, -0.1, -10), 0.5, vec3(0, 0, 255), 0, 1.2);
+		Sphere yellowSphere = Sphere(vec3(6, 3, -25), 2, vec3(255, 255, 0), 0, 1.2);
 
 		//Instance of plane			//Col		//Point on plane	//Normal
-		plane testPlane = plane(vec3(50, 50, 0), vec3(0, -1, 0), vec3(0, 1, 0));
+		plane testPlane = plane(vec3(10, 100, 0), vec3(0, -1, 0), vec3(0, 1, 0));
 		
 		//Triangle
-		triangle testTriangle = triangle(vec3(0, 0, -1), vec3(0, 1, -2), vec3(-1.9, -1, -2), vec3(1.6, -0.5, -2), vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
+		triangle testTriangle = triangle(vec3(1, 0.2, -20), vec3(0, 1, -2), vec3(-1.9, -1, -2), vec3(1.6, -0.5, -2), vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
 
-		vector<VertexWithAll> mesh = loadOBJ("cube.obj");
+		vector<VertexWithAll> mesh = loadOBJ("Cube.obj");
 
 		vector<triangle> trisToLoad;
 
 		for(int m = 0; m< mesh.size(); m+=3)
 		{
 			
-			triangle tr = triangle(vec3(-2, 0, -20), mesh[m].position, mesh[m+1].position, mesh[m+2].position, vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), mesh[m].normal, mesh[m+1].normal, mesh[m+2].normal, 1, 1);
-			trisToLoad.push_back(tr);			
+			triangle tr = triangle(vec3(-0.5, -0.1, -5), mesh[m].position, mesh[m+1].position, mesh[m+2].position, vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), mesh[m].normal, mesh[m+1].normal, mesh[m+2].normal, 1, 1);
+			//Disable shadows cause they break on loaded models
+			tr.inShadow = false;
+			trisToLoad.push_back(tr);	
+			
 		}
 		
 		for(int t = 0; t<trisToLoad.size(); t++)
@@ -170,13 +188,14 @@ int main(int argc, char* argv[])
 			shapes.push_back(&trisToLoad[t]);
 		}
 
-
 		//Add them into our vector
 		shapes.push_back(&redSphere);
 		shapes.push_back(&greenSphere);
+		shapes.push_back(&yellowSphere);
+		shapes.push_back(&blueSphere);
 		shapes.push_back(&testPlane);
-		//shapes.push_back(&testTriangle);
-	
+		shapes.push_back(&testTriangle);
+		
 
 		cout << shapes.size();
 
@@ -191,11 +210,13 @@ int main(int argc, char* argv[])
 		vec3 camVec;
 
 		///light setting
-		vec3 lightSrc;
-		lightSrc.x = 0.0; lightSrc.y = 20.0; lightSrc.z = -1.0;
-		vec3 lightIntensity = vec3(0.1, 0.1, 0.1);
+
+		light light1(vec3(0.1, 0.1, 0.1), vec3(0, 20, 0));
+		light light2(vec3(0.1, 0.1, 0.1), vec3(-2, 15, 0));
 
 
+		lights.push_back(&light1);
+		lights.push_back(&light2);
 
 		vector<float> saved_rayDists;
 		vector<vec3> saved_colour;
@@ -255,40 +276,34 @@ int main(int argc, char* argv[])
 							{
 								if (currShape == j) continue;
 
-								
-
-								//Shadow calculation
-								if (shadowCalc(lightSrc, rayDir, hit.intersectPoint, shapes[j], shadowHit))
+								//For each light in the scene
+								for(int l =0; l<lights.size(); l++)
 								{
-									//saved_rayDists.push_back(shadowHit.rayDist);
-									//saved_colour.push_back(vec3(0, 0, 0));
-									inShadow = true;
-									break;
-
-								}
-								else if(reflectCalc(lightSrc, rayDir, hit.intersectPoint, shapes[j], reflectHit))
-								{
-									
+									//Shadow calculation
+									if (shadowCalc(lights[l]->currPos, rayDir, hit.intersectPoint, shapes[j], shadowHit))
+									{
+										//saved_rayDists.push_back(shadowHit.rayDist);
+										//saved_colour.push_back(vec3(0, 0, 0));
+										inShadow = true;
+										break;
+									}
 								}
 							}
 
 							if (!inShadow)
 							{
-								//If we hit, save our ray
-								saved_rayDists.push_back(hit.rayDist);
-								hit.ambientCol = shapes[currShape]->currColour;
-								//Calculate colour and push onto vector for later
-								//Base colour
-								shapes[currShape]->ComputeColour(lightIntensity,lightSrc, hit.intersectPoint, rayDir, colVal);
-
-
-								
-
-								
-								saved_colour.push_back(colVal);
+								//For each light in the scene
+								for (int l = 0; l < lights.size(); l++)
+								{
+									//If we hit, save our ray
+									saved_rayDists.push_back(hit.rayDist);
+									hit.ambientCol = shapes[currShape]->currColour;
+									//Calculate colour and push onto vector for later
+									//Base colour
+									colVal = shapes[currShape]->ComputeColour(lights[l]->currIntensity, lights[l]->currPos, hit.intersectPoint, rayDir);
+									saved_colour.push_back(colVal);
+								}
 							}
-
-							
 						}
 					}
 
