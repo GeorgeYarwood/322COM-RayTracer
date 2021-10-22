@@ -12,7 +12,6 @@
 #include "rayHit.h"
 #include "OBJloader.h"
 #include "AABB.h";
-#include <thread>;
 using namespace std;
 using namespace glm;
 
@@ -104,7 +103,23 @@ bool shadowCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape *currShape, rayHit 
 	return false;
 }
 
+bool reflectCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape* currShape, rayHit& reflectHit)
+{
 
+	vec3 normal = (normalize(IntPoint - currShape->currPos));
+
+	//Calculate ray direction
+	vec3 l = dir - 2 * dot(normalize(dir), normalize(normal)) * normal;
+	vec3 orig = IntPoint + normal * 0.0001f;
+	if (currShape->intersection(orig, l, reflectHit))
+	{
+		
+		//Make it so
+		return true;
+	}
+
+	return false;
+}
 
 
 int main(int argc, char* argv[])
@@ -201,7 +216,7 @@ int main(int argc, char* argv[])
 
 
 		lights.push_back(&light1);
-		lights.push_back(&light2);
+		//lights.push_back(&light2);
 
 		vector<float> saved_rayDists;
 		vector<vec3> saved_colour;
@@ -284,6 +299,7 @@ int main(int argc, char* argv[])
 									saved_rayDists.push_back(hit.rayDist);
 									hit.ambientCol = shapes[currShape]->currColour;
 									//Calculate colour and push onto vector for later
+									//Base colour
 									colVal = shapes[currShape]->ComputeColour(lights[l]->currIntensity, lights[l]->currPos, hit.intersectPoint, rayDir);
 									saved_colour.push_back(colVal);
 								}
