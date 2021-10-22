@@ -23,8 +23,8 @@ SDL_Renderer* sdlRenderer;
 SDL_Event event;
 
 //Rendering width/height/FOV
-int width = 1280;
-int height = 720;
+int width = 640;
+int height = 480;
 float fov = 110;
 
 
@@ -97,6 +97,20 @@ bool shadowCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape *currShape, rayHit 
 	}
 	return false;
 }
+
+bool reflectCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape* currShape, rayHit& reflectHit)
+{
+
+	vec3 normal = (normalize(IntPoint - currShape->currPos));
+
+	//Calculate ray direction
+	vec3 l = dir - 2 * dot(normalize(dir), normalize(normal)) * normal;
+	vec3 orig = IntPoint + normal * 0.0001f;
+	
+
+	return false;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -225,7 +239,9 @@ int main(int argc, char* argv[])
 					//Written to and saved with each intersection check
 					rayHit hit;
 					rayHit shadowHit;
+					rayHit reflectHit;
 					vec3 colVal;
+					
 
 					bool inShadow = false;
 
@@ -239,6 +255,8 @@ int main(int argc, char* argv[])
 							{
 								if (currShape == j) continue;
 
+								
+
 								//Shadow calculation
 								if (shadowCalc(lightSrc, rayDir, hit.intersectPoint, shapes[j], shadowHit))
 								{
@@ -248,6 +266,10 @@ int main(int argc, char* argv[])
 									break;
 
 								}
+								else if(reflectCalc(lightSrc, rayDir, hit.intersectPoint, shapes[j], reflectHit))
+								{
+									
+								}
 							}
 
 							if (!inShadow)
@@ -256,7 +278,13 @@ int main(int argc, char* argv[])
 								saved_rayDists.push_back(hit.rayDist);
 								hit.ambientCol = shapes[currShape]->currColour;
 								//Calculate colour and push onto vector for later
+								//Base colour
 								shapes[currShape]->ComputeColour(lightIntensity,lightSrc, hit.intersectPoint, rayDir, colVal);
+
+
+								
+
+								
 								saved_colour.push_back(colVal);
 							}
 
@@ -278,9 +306,9 @@ int main(int argc, char* argv[])
 					//If we don't hit anything, draw default colours
 					else if (saved_rayDists.size() == 0)
 					{
-						framebuffer[x][y].x = 1.0;
-						framebuffer[x][y].y = 1.0;
-						framebuffer[x][y].z = 1.0;
+						framebuffer[x][y].x = 0.1;
+						framebuffer[x][y].y = 0.1;
+						framebuffer[x][y].z = 1;
 
 
 						drawPixel(pixels, x, y, convertColour(framebuffer[x][y]));

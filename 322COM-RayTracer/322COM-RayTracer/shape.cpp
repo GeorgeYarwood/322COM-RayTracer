@@ -41,5 +41,13 @@ void shape::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec
 	Cs = pow(tt, 20) * currSpecIntensity;
 
 	//ColValue = Cs;
-	ColValue = diffColour + Cs;
+
+	vec3 l = sourcePt - 2 * dot(normalize(sourcePt), normalize(surNorm)) * surNorm;
+
+
+	vec3 newIntPoint = IntPt + surNorm * 0.0001f;
+
+	
+
+	ColValue = diffColour + Cs; //* ComputeColour(ambLightIntensity, newIntPoint, IntPt, l, ColValue);
 }
