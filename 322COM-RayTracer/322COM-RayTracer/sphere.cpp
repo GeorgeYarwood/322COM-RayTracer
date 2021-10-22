@@ -15,7 +15,7 @@ Sphere::~Sphere()
 bool Sphere::intersection(vec3& orig, vec3& dir, rayHit& hit)
 {
 	float t0, t1;
-	// geometric solution  // vector dir has to be normalize, length is 1.0
+	
 	vec3 L = currPos - orig;
 	float tca = dot(L, dir);
 	if (tca < 0) return false;
@@ -29,8 +29,8 @@ bool Sphere::intersection(vec3& orig, vec3& dir, rayHit& hit)
 	if (t0 > t1) std::swap(t0, t1);
 
 	if (t0 < 0) {
-		t0 = t1; // if t0 is negative, let's use t1 instead 
-		if (t0 < 0) return false; // both t0 and t1 are negative 
+		t0 = t1; 
+		if (t0 < 0) return false; 
 	}
 
 	hit.intersectPoint = orig + dir * t0;

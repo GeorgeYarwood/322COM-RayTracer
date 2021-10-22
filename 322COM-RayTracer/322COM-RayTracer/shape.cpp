@@ -40,13 +40,6 @@ vec3 shape::ComputeColour(vec3 ambLightIntensity, const vec3 sourcePt, const vec
 	tt = std::max(0.0, (double)dot(rVec, -dir));
 	Cs = pow(tt, 20) * currSpecIntensity;
 
-	//ColValue = Cs;
-
-	vec3 l = sourcePt - 2 * dot(normalize(sourcePt), normalize(surNorm)) * normalize(surNorm);
-	vec3 newIntPoint = IntPt + surNorm * 0.001f;
-
-
-
 	
 	return diffColour + Cs;
 
