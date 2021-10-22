@@ -23,9 +23,9 @@ SDL_Renderer* sdlRenderer;
 SDL_Event event;
 
 //Rendering width/height/FOV
-int width = 640;
-int height = 480;
-float fov = 300;
+int width = 1280;
+int height = 720;
+float fov = 110;
 
 
 int pitch;
@@ -88,7 +88,7 @@ bool shadowCalc(vec3 lightSrc,vec3 dir, vec3 IntPoint, shape *currShape, rayHit 
 	vec3 l =  lightSrc - IntPoint;
 	vec3 normal = (normalize(IntPoint - currShape->currPos));
 	l = normalize(l);
-	vec3 orig = IntPoint + normal * 0.00001f;
+	vec3 orig = IntPoint + normal * 0.0001f;
 	//If we hit an object that should be in shadow
 	if(currShape->intersection(orig, l, shadowHit))
 	{
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
 		Uint32* pixels = new Uint32[width * height];
 
 		//Set background colour to white
-		memset(pixels, 155, width * height * sizeof(Uint32));
+		//memset(pixels, 155, width * height * sizeof(Uint32));
 
 		//Vector of shapes we iterate through
 		vector<shape*>shapes;
@@ -135,40 +135,34 @@ int main(int argc, char* argv[])
 		Sphere greenSphere = Sphere(vec3(2, 0, -11), 1, vec3(0, 255, 0), 0, 1.2);
 
 		//Instance of plane			//Col		//Point on plane	//Normal
-		plane testPlane = plane(vec3(0, 255, 0), vec3(0, -1, 0), vec3(0, 1, 0));
+		plane testPlane = plane(vec3(50, 50, 0), vec3(0, -1, 0), vec3(0, 1, 0));
 		
 		//Triangle
-		triangle testTri1 = triangle(vec3(0, 0,-5),vec3(1, 1, 1), vec3(1, 1, -1), vec3(1, 1,1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
-		triangle testTri2 = triangle(vec3(0, 0, -5),vec3(-1, -1, 1), vec3(1, -1, 1), vec3(-1, 1,1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
-		triangle testTri3 = triangle(vec3(0, 0, -5),vec3(-1, -1, -1), vec3(-1, -1, 1), vec3(1, -1,-1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
-		triangle testTri4 = triangle(vec3(0, 0, -5),vec3(-1, -1, 1), vec3(-1, -1, -1), vec3(1, 1,-1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
-		triangle testTri5 = triangle(vec3(0, 0, -5),vec3(1, -1, 1), vec3(1, -1, -1), vec3(-1, 1,-1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
-		triangle testTri6 = triangle(vec3(0, 0, -5),vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1,-1), vec3(255, 0, 0), vec3(0,255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
-		
-		std::vector<VertexWithAll> mesh = loadOBJ("cube.obj");
+		triangle testTriangle = triangle(vec3(0, 0, -1), vec3(0, 1, -2), vec3(-1.9, -1, -2), vec3(1.6, -0.5, -2), vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), vec3(0.0, 0.6, 1.0), vec3(-0.4, -0.4, 1.0), vec3(0.4, -0.4, 1), 0, 1);
 
+		vector<VertexWithAll> mesh = loadOBJ("cube.obj");
 
-
+		vector<triangle> trisToLoad;
 
 		for(int m = 0; m< mesh.size(); m+=3)
 		{
 			
-			//triangle tr = triangle(vec3(0,0,-5),mesh[m].position, mesh[m+1].position, mesh[m+2].position, vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), mesh[m].normal, mesh[m+1].normal, mesh[m+2].normal, 1, 1);
-			//shapes.push_back(&tr);
-			//cout << &tr.currV0 << &tr.currV1 << &tr.currV2;
-			
+			triangle tr = triangle(vec3(-2, 0, -20), mesh[m].position, mesh[m+1].position, mesh[m+2].position, vec3(255, 0, 0), vec3(0, 255, 0), vec3(0, 0, 255), mesh[m].normal, mesh[m+1].normal, mesh[m+2].normal, 1, 1);
+			trisToLoad.push_back(tr);			
+		}
+		
+		for(int t = 0; t<trisToLoad.size(); t++)
+		{
+			shapes.push_back(&trisToLoad[t]);
 		}
 
+
 		//Add them into our vector
-		//shapes.push_back(&redSphere);
-		//shapes.push_back(&greenSphere);
-		//shapes.push_back(&testPlane);
-		shapes.push_back(&testTri1);
-		shapes.push_back(&testTri2);
-		shapes.push_back(&testTri3);
-		shapes.push_back(&testTri4);
-		shapes.push_back(&testTri5);
-		shapes.push_back(&testTri6);
+		shapes.push_back(&redSphere);
+		shapes.push_back(&greenSphere);
+		shapes.push_back(&testPlane);
+		//shapes.push_back(&testTriangle);
+	
 
 		cout << shapes.size();
 
@@ -184,7 +178,7 @@ int main(int argc, char* argv[])
 
 		///light setting
 		vec3 lightSrc;
-		lightSrc.x = 0.0; lightSrc.y = 10.0; lightSrc.z = 0.0;
+		lightSrc.x = 0.0; lightSrc.y = 20.0; lightSrc.z = -1.0;
 		vec3 lightIntensity = vec3(0.1, 0.1, 0.1);
 
 

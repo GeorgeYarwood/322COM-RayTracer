@@ -140,21 +140,22 @@ static std::vector<VertexWithAll> loadOBJ(std::string file_name)
 	{
 
 		vertices[i].position = vertex_positions[vertex_position_indicies[i] - 1];
-		std::cout << "VertX: " << vertices[i].position.x << ", VertY: " << vertices[i].position.y << ", VertZ: " << vertices[i].position.z << "\n";
+		//std::cout << "VertX: " << vertices[i].position.x << ", VertY: " << vertices[i].position.y << ", VertZ: " << vertices[i].position.z << "\n";
 
-		vertices[i].textcoord = vertex_textcoords[vertex_textcoord_indicies[i] - 1];
+		//vertices[i].textcoord = vertex_textcoords[vertex_textcoord_indicies[i] - 1];
+
 		vertices[i].normal = vertex_normals[vertex_normal_indicies[i] - 1];
-		vertices[i].color = glm::vec3(1.f, 1.f, 1.f);
+		vertices[i].color = glm::vec3(255, 0, 0);
 	}
 
 
 
 
 	//DEBUG ZONE TESTING PURPOSES
-	std::cout << "Nr of vertices: " << vertices.size() << "\n";
+	std::cout << "Verts: " << vertices.size() << "\n";
 
 
 	//load success
-	std::cout << " obj file loaded!!!" << "\n";
+	std::cout << "OBJ loaded" << "\n";
 	return vertices;
 }
